@@ -21,10 +21,10 @@ def usage():
 
 def getUsers(conn):
     # Retrieve the list of users
-    conn.request("GET","""/api/users?filter={"_id":1}""")
+    conn.request("GET","""/api/users?filter={"_id":1}""") #sends an http get request to the specific db
     response = conn.getresponse()
     data = response.read()
-    d = json.loads(data)
+    d = json.loads(data) #converts the json response string to dict
 
     # Array of user IDs
     users = [str(d['data'][x]['_id']) for x in range(len(d['data']))]

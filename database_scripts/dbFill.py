@@ -20,6 +20,7 @@ from random import choice
 from datetime import date
 from time import mktime
 
+
 def usage():
     print('dbFill.py -u <baseurl> -p <port> -n <numUsers> -t <numTasks>')
 
