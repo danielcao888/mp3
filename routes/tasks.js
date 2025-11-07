@@ -74,10 +74,7 @@ module.exports = function (router) {
 
 
         } catch (err) {
-            return res.status(500).json({
-                message:"Server Error",
-                data:{}
-            })
+            return res.status(500).json({message:"Server Error",data:{}})
         }
     });
 
@@ -119,7 +116,7 @@ module.exports = function (router) {
 
         const savedTask = await newTask.save();
 
-        // Update user's pendingTasks if assigned
+        // Update user's pendingTasks if it was assigned
         if (savedTask.assignedUser !== "") {
             await User.findByIdAndUpdate(savedTask.assignedUser, {
                 $addToSet: { pendingTasks: savedTask._id.toString() }
@@ -152,7 +149,7 @@ module.exports = function (router) {
 
         const task = await query.exec();
 
-        if (!task) {
+        if (!task) { 
             return res.status(404).json({ message: "Task not found", data: {} });
         }
 
@@ -188,7 +185,7 @@ module.exports = function (router) {
 
         if (assignedUser && assignedUser.trim() !== "") {
             const user = await User.findById(assignedUser);
-            if (!user) {
+            if (!user) { //return 409 if user does not exist
                 return res.status(400).json({ message: "Invalid Request: assigned user does not exist", data: {} });
             }
             newAssignedUser = user._id.toString();
@@ -223,7 +220,7 @@ module.exports = function (router) {
             });
         }
 
-        return res.status(200).json({ message: "Task sucessfully updated", data: savedTask });
+        return res.status(200).json({ message: "Task updated", data: savedTask });
 
     } catch {
         return res.status(500).json({ message: "Server Error", data: {} });
@@ -237,7 +234,7 @@ module.exports = function (router) {
             return res.status(404).json({ message: "Task not found", data: {} });
         }
 
-        // If task was assigned remove from users
+        // If task was assigned remove from users before. deleting
         if (taskToDelete.assignedUser !== "") {
             await User.findByIdAndUpdate(taskToDelete.assignedUser, {
                 $pull: { pendingTasks: taskToDelete._id.toString() }

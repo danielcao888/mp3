@@ -51,7 +51,7 @@ module.exports = function (router) {
                 }
                 query = query.limit(limitNum)
             }
-            //this time return unlimited amount of users as default
+            //this time we do unlimited amount of users as default
 
             if (req.query.count && req.query.count == "true") {
                 let where = {}
@@ -67,10 +67,7 @@ module.exports = function (router) {
             return res.status(200).json({message:"OK",data:users});
 
         } catch (err) {
-            return res.status(500).json({
-                message:"Server Error",
-                data:{}
-            })
+            return res.status(500).json({message:"Server Error",data:{}})
         }  
     });
 
@@ -89,7 +86,7 @@ module.exports = function (router) {
 
             const existingEmail = await User.findOne({email:email}) 
 
-            if(existingEmail) {
+            if(existingEmail) { //check if existing email there, if so return 409 error 
                 return res.status(409).json({message: "Invalid Request: a user with this email already exists", data: {}});
             }
             const newUser = new User({name, email}); //creates the mongoosemodel object
@@ -97,10 +94,7 @@ module.exports = function (router) {
             return res.status(201).json({ message: "User created", data: saved });
 
         } catch(error){
-            return res.status(500).json({
-                message:"Server Error",
-                data:{}
-            })
+            return res.status(500).json({message:"Server Error",data:{}})
         }
     })
     //users id things
@@ -147,7 +141,7 @@ module.exports = function (router) {
         }
 
         let user = await User.findById(req.params.id);
-        if (!user) {
+        if (!user) { //if no usre we return a 404
             return res.status(404).json({ message: "User not found", data: {} });
         }
 
@@ -163,10 +157,7 @@ module.exports = function (router) {
         // Remove user assignment from all the old tasks
         const oldTasks = user.pendingTasks;
         for (let taskId of oldTasks) {
-            await Task.findByIdAndUpdate(taskId, {
-                assignedUser: "",
-                assignedUserName: "unassigned"
-            });
+            await Task.findByIdAndUpdate(taskId, {assignedUser: "", assignedUserName: "unassigned"});
         }
 
         // Update the user fields
@@ -201,7 +192,7 @@ module.exports = function (router) {
 });
 
 
-    //delete for users id (Delete specific user  or 404 error)
+    //delete for users id (Delete specific user or 404 error)
     router.delete('/:id', async (req, res) => {
     try {
         const user = await User.findById(req.params.id);
@@ -209,13 +200,10 @@ module.exports = function (router) {
             return res.status(404).json({ message: "User not found", data: {} });
         }
 
-        // Unassign all the tasks from this user
+        // Unassign all the tasks from this user nefore deleting
         const tasks = user.pendingTasks;
         for (let taskId of tasks) {
-            await Task.findByIdAndUpdate(taskId, {
-                assignedUser: "",
-                assignedUserName: "unassigned"
-            });
+            await Task.findByIdAndUpdate(taskId, { assignedUser: "", assignedUserName: "unassigned"});
         }
 
         await User.findByIdAndDelete(req.params.id);
